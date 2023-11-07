@@ -1,0 +1,10 @@
+docker network create -d bridge hdfs_bridge
+docker network inspect hdfs_bridge
+
+docker-compose up -d <service>
+docker-compose down <service>
+docker-compose run --rm --build spark
+
+hdfs dfs -mkdir -p /spark/event-logs
+hdfs dfs -mkdir -p /spark/jars
+hdfs dfs -copyFromLocal /opt/spark/jars/* /spark/jars
