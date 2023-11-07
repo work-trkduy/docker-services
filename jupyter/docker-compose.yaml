@@ -1,0 +1,81 @@
+version: "3"
+
+x-jupyter-common:
+  &jupyter-common
+  image: jupyter-python3-tensorflow
+  build:
+    context: .
+    dockerfile_inline: |
+      FROM tensorflow/tensorflow:2.14.0-gpu-jupyter
+      
+      ENV HADOOP_HOME=/opt/spark
+      ENV SPARK_HOME=/opt/spark
+
+      RUN apt -y update
+      RUN apt -y install wget openjdk-11-jdk
+
+      # install spark
+      COPY ./spark-3.4.1-bin-hadoop3.tgz .
+      RUN tar -zxvf spark-3.4.1-bin-hadoop3.tgz
+      RUN rm spark-3.4.1-bin-hadoop3.tgz
+      RUN mv spark-3.4.1-bin-hadoop3 $$SPARK_HOME
+
+      COPY requirement.txt .
+      RUN pip install -r requirement.txt
+
+      WORKDIR /work
+      EXPOSE 8888
+      CMD ["bash", "-c", "source /etc/bash.bashrc && jupyter lab --notebook-dir=/work --ip 0.0.0.0 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"]
+
+services:
+  jupyterlab-kduy:
+    <<: *jupyter-common
+    container_name: jupyterlab-kduy
+    command: ["bash", "-c", "source /etc/bash.bashrc && jupyter lab --notebook-dir=/work --ip 0.0.0.0 --no-browser --allow-root --NotebookApp.token='kduy' --NotebookApp.password='kduy'"]
+    # hostname: jupyterlab-kduy
+    # ports:
+    #   - 8888:8888
+    #   - 6006:6006
+    #   - 4040:4040
+    network_mode: host
+    volumes:
+      - ./kduy:/work
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  jupyterlab-hiep:
+    <<: *jupyter-common
+    container_name: jupyterlab-hiep
+    command: ["bash", "-c", "source /etc/bash.bashrc && jupyter lab --notebook-dir=/work --ip 0.0.0.0 --port 8890 --no-browser --allow-root --NotebookApp.token='hiep' --NotebookApp.password='hiep'"]
+    hostname: jupyterlab-hiep
+    ports:
+      - 8890:8890
+    volumes:
+      - ./kduy:/work
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  jupyterlab-tnam:
+    <<: *jupyter-common
+    container_name: jupyterlab-tnam
+    command: ["bash", "-c", "source /etc/bash.bashrc && jupyter lab --notebook-dir=/work --ip 0.0.0.0 --port 8889 --no-browser --allow-root --NotebookApp.token='tnam' --NotebookApp.password='tnam'"]
+    hostname: jupyterlab-tnam
+    ports:
+      - 8889:8889
+    volumes:
+      - ./tnam:/work
+    deploy:
+      resources:
+        limits:
+          cpus: "28"
+          memory: "32G"

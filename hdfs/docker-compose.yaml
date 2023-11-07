@@ -1,0 +1,80 @@
+version: "3"
+
+x-hadoop-common:
+  &hadoop-common
+  image: apache/hadoop:3.3.6
+  network_mode: host
+  env_file:
+    - ./config.env
+  user: "hadoop"
+  volumes:
+    - ./tmp:/tmp/hadoop-hadoop
+    - ./share:/share
+    - ../applications/jdk-11.0.20:/java
+    - ../applications/hadoop-3.3.6:/opt/hadoop2
+    - ../applications/spark-3.4.1-bin-hadoop3:/opt/spark
+  restart: always
+
+services:
+  namenode:
+    <<: *hadoop-common
+    container_name: namenode
+    command:
+      - /bin/bash
+      - -c
+      - |
+        cp -rf $$HADOOP_CONF_DIR/* /opt/hadoop2/etc/hadoop
+        cp -rf $$HADOOP_CONF_DIR/* /opt/spark/conf
+        if [ -d "/tmp/hadoop-hadoop/dfs/name" ] && [ "$(ls -A /tmp/hadoop-hadoop/dfs/name)" ]; then
+          echo "Namenode is already formatted"
+        else
+          echo "Formatting namenode dir..."
+          hdfs namenode -format
+        fi
+        hdfs namenode
+
+  resourcemanager:
+    <<: *hadoop-common
+    container_name: resourcemanager
+    command: ["yarn", "resourcemanager"]
+
+  timelineserver:
+    <<: *hadoop-common
+    container_name: timelineserver
+    command: ["yarn", "timelineserver"]
+
+  jobhistoryserver:
+    <<: *hadoop-common
+    container_name: jobhistoryserver
+    command: ["mapred", "historyserver"]
+
+  datanode:
+    <<: *hadoop-common
+    container_name: datanode
+    command: ["hdfs", "datanode"]
+
+  nodemanager:
+    <<: *hadoop-common
+    image: hadoop-python3
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.11.6
+
+        USER root
+        RUN python3 -m pip install --upgrade pip
+        ADD requirements.txt .
+        RUN pip install -r requirements.txt
+        
+        ENV JAVA_HOME=/java
+        ENV HADOOP_HOME=/opt/hadoop2
+        ENV HADOOP_CONF_DIR=$$HADOOP_HOME/etc/hadoop
+        ENV PATH=$$PATH:$$HADOOP_HOME/bin
+        ENV HADOOP_USER_NAME=hadoop
+
+        RUN useradd -m hadoop
+        USER hadoop
+        WORKDIR /home/hadoop
+
+    container_name: nodemanager
+    command: ["yarn", "nodemanager"]

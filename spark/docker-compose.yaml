@@ -1,0 +1,47 @@
+version: "3"
+
+x-spark-common:
+  &spark-common
+  image: ubuntu:20.04
+  network_mode: host
+  env_file:
+    - ./config.env
+  volumes:
+    - ../applications/jdk-11.0.20:/java
+    - ../applications/hadoop-3.3.6:/opt/hadoop
+    - ../applications/spark-3.4.1-bin-hadoop3:/opt/spark
+    - ./share:/share
+
+services:
+  spark-shell:
+    <<: *spark-common
+    command:
+      - bash
+      - -c
+      - |
+        cp -rf $$HADOOP_CONF_DIR/* $$SPARK_HOME/conf
+        cp -rf /share/hive-site.xml $$SPARK_HOME/conf
+        /share/start-spark-shell.sh
+    container_name: spark-shell
+
+  spark-historyserver:
+    <<: *spark-common
+    command:
+      - bash
+      - -c
+      - |
+        cp -rf $$HADOOP_CONF_DIR/* $$SPARK_HOME/conf
+        cp -rf /share/spark-defaults.conf $$SPARK_HOME/conf
+        $$SPARK_HOME/sbin/start-history-server.sh
+    container_name: spark-historyserver
+    restart: always
+
+  # dataiku:
+  #   <<: *spark-common
+  #   image: dataiku/dss:11.2.0
+  #   container_name: dataiku
+  #   hostname: dataiku
+  #   ports:
+  #     - 10000:10000
+  #   volumes:
+  #     - ./dataiku/dss:/home/dataiku/dss

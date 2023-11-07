@@ -1,0 +1,15 @@
+services:
+  twingate-docker-connector:
+    image: twingate/connector:latest
+    container_name: twingate-docker-connector
+    restart: always
+    environment:
+      - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+      - TWINGATE_API_ENDPOINT=/connector.stock
+      - TWINGATE_NETWORK="khuongduy"
+      - TWINGATE_ACCESS_TOKEN="eyJhbGciOiJFUzI1NiIsImtpZCI6IjN1dk9yamV0VDRNZWhqZzVvbTJBSVp5R0JNdGNlQS0zNmxvQW5qSFJ5Y1UiLCJ0eXAiOiJEQVQifQ.eyJudCI6IkFOIiwiYWlkIjoiMTc1NTczIiwiZGlkIjoiMTAxNDAxOSIsImp0aSI6ImExYjVhYzk1LTJiNjgtNGFlMS05ODA4LTBlMThiM2ViNTdlOCIsImlzcyI6InR3aW5nYXRlIiwiYXVkIjoia2h1b25nZHV5IiwiZXhwIjoxNjk4NDA0Mzc1LCJpYXQiOjE2OTg0MDA3NzUsInZlciI6IjQiLCJ0aWQiOiI1ODQ2MSIsInJudyI6MTY5ODQwMTA3NSwicm5ldGlkIjoiNzMxMjMifQ.eh3E7e_aBdlbuXOaZEqM1q6yxY4u_Q2rhFdzQl6VHCKxQZQulsUffXwkuM9UdTBYPi4UHoROouLYhlVJvyhFEw"
+      - TWINGATE_REFRESH_TOKEN="z4aeqsg36pi5NyxIrgCoot0AWzmR78N_KjUPDZuDdh3jBfYLGBo7smjzgl0vOqV0uN4kC2k1KllcRA9VaJUSCUhnX2WDC6OhBlpVWHWZ6ayctvblwPgdFjcGOgVfnT-YIXm70g"
+      - TWINGATE_LABEL_HOSTNAME="`kduy-server`"
+      - TWINGATE_LOG_LEVEL=3
+    sysctls:
+      net.ipv4.ping_group_range: "0 2147483647"

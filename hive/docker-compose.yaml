@@ -1,0 +1,53 @@
+version: "3"
+
+x-hive-common:
+  &hive-common
+  image: apache/hive:3.1.3
+  env_file:
+    - ./config.env
+  volumes:
+    - ../applications/hadoop-3.3.6/etc/hadoop:/hive_custom_conf
+  restart: always
+
+
+services:
+  hive-postgres:
+    <<: *hive-common
+    image: postgres:13.12-alpine
+    container_name: hive-postgres
+    hostname: hive-postgres
+    volumes:
+      - ./postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hadoop", "-d", "hive_metastore_db"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  hive-metastore:
+    <<: *hive-common
+    container_name: hive-metastore
+    hostname: hive-metastore
+    environment:
+      - SERVICE_NAME=metastore
+      - IS_RESUME="true"
+    ports:
+      - 9083:9083
+    depends_on:
+      hive-postgres:
+        condition: service_healthy
+
+  # hiveserver2:
+  #   <<: *hive-common
+  #   container_name: hiveserver2
+  #   hostname: hiveserver2
+  #   environment:
+  #     - SERVICE_NAME=hiveserver2
+  #     - IS_RESUME="true"
+  #   ports:
+  #     - 10000:10000
+  #     - 10002:10002
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy

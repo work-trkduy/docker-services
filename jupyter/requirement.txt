@@ -1,0 +1,8 @@
+jupyterlab
+jupyter-resource-usage
+jupyterlab-nvdashboard
+pyspark==3.4.1
+pyarrow
+pandas
+scikit-learn
+networkx
