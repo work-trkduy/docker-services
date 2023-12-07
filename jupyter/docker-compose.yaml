@@ -28,6 +28,25 @@ x-jupyter-common:
       CMD ["bash", "-c", "source /etc/bash.bashrc && jupyter lab --notebook-dir=/work --ip 0.0.0.0 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"]
 
 services:
+  jupyterlab-spark:
+    <<: *jupyter-common
+    container_name: jupyterlab-spark
+    command: ["bash", "-c", "source /etc/bash.bashrc && jupyter lab --notebook-dir=/work --ip 0.0.0.0 --no-browser --allow-root --NotebookApp.token='kduy' --NotebookApp.password='kduy'"]
+    network_mode: host
+    env_file:
+      - ./config.env
+    volumes:
+      - ./kduy:/work
+      - ../applications/hadoop-3.3.6:/opt/hadoop
+      - ../applications/spark-3.4.1-bin-hadoop3:/opt/spark
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
   jupyterlab-kduy:
     <<: *jupyter-common
     container_name: jupyterlab-kduy

@@ -6,7 +6,8 @@ x-hive-common:
   env_file:
     - ./config.env
   volumes:
-    - ../applications/hadoop-3.3.6/etc/hadoop:/hive_custom_conf
+    - ../applications/hadoop-3.3.6:/opt/hadoop
+    - ../applications/hive_conf_dir:/hive_custom_conf_dir
   restart: always
 
 
@@ -45,6 +46,7 @@ services:
   #   environment:
   #     - SERVICE_NAME=hiveserver2
   #     - IS_RESUME="true"
+  #     - SERVICE_OPTS="$$SERVICE_OPTS -Dhive.metastore.uris=thrift://hivemetastore:9083"
   #   ports:
   #     - 10000:10000
   #     - 10002:10002

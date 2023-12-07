@@ -1,4 +1,5 @@
-pyspark
+pyspark==3.4.1
+pyarrow
 numpy
 pandas
 rapidfuzz

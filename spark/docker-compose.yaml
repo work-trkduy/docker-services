@@ -10,6 +10,7 @@ x-spark-common:
     - ../applications/jdk-11.0.20:/java
     - ../applications/hadoop-3.3.6:/opt/hadoop
     - ../applications/spark-3.4.1-bin-hadoop3:/opt/spark
+    - ../applications/hive_conf_dir:/hive_conf_dir
     - ./share:/share
 
 services:
@@ -20,7 +21,7 @@ services:
       - -c
       - |
         cp -rf $$HADOOP_CONF_DIR/* $$SPARK_HOME/conf
-        cp -rf /share/hive-site.xml $$SPARK_HOME/conf
+        cp -rf /hive_conf_dir/hive-site.xml $$SPARK_HOME/conf
         /share/start-spark-shell.sh
     container_name: spark-shell
 
