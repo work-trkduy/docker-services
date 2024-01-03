@@ -80,8 +80,8 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/../applications/jdk-11.0.20:/java
-    - ${AIRFLOW_PROJ_DIR:-.}/../applications/spark-3.4.1-bin-hadoop3:/opt/spark
     - ${AIRFLOW_PROJ_DIR:-.}/../applications/hadoop-3.3.6/:/opt/hadoop
+    - ${AIRFLOW_PROJ_DIR:-.}/../applications/spark-3.4.1-bin-hadoop3:/opt/spark
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
