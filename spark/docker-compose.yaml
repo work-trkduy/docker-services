@@ -27,6 +27,7 @@ services:
       - bash
       - -c
       - |
+        cp -rf /share/spark-defaults.conf $$SPARK_HOME/conf
         $$SPARK_HOME/sbin/start-history-server.sh
     container_name: spark-historyserver
     restart: always
