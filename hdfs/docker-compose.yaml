@@ -4,6 +4,7 @@ x-hadoop-common:
   &hadoop-common
   image: apache/hadoop:3.3.6
   network_mode: host
+  privileged: true
   env_file:
     - ./config.env
   user: "hadoop"
@@ -78,3 +79,7 @@ services:
 
     container_name: nodemanager
     command: ["yarn", "nodemanager"]
+    deploy:
+      resources:
+        limits:
+          memory: 56G
