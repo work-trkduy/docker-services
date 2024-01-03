@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    hostname: minio
+    command: ["server", "/data", "--console-address", ":9090"]
+    ports:
+      - 9001:9000
+      - 9090:9090
+    volumes:
+      - ./data:/data
+      - ./share:/share
+    env_file:
+      - ./config.env
+    restart: always
